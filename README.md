@@ -1,2 +1,2 @@
 # otterss
-Rss reader
+Rss reader app for Android
