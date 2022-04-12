@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home">Inicio</string>
+    <string name="feeds">Suscripciones</string>
+    <string name="lists">Listas</string>
+    <string name="settings">Ajustes</string>
+</resources>
