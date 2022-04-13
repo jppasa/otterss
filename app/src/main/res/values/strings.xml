@@ -4,4 +4,7 @@
     <string name="feeds">Feeds</string>
     <string name="lists">Lists</string>
     <string name="settings">Settings</string>
+    <string name="no_items">Subscribe to a feed!</string>
+    <string name="input_url">I have a URL</string>
+    <string name="browse_feeds">Browse feeds</string>
 </resources>

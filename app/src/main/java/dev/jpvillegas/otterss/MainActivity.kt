@@ -4,32 +4,31 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dev.jpvillegas.otterss.home.HomeScreen
 import dev.jpvillegas.otterss.navigation.NavigationItem
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
-import dev.jpvillegas.otterss.ui.theme.Purple700
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    MainScreenView(listOf())
                 }
             }
         }
@@ -49,59 +48,42 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreenView(){
+fun MainScreenView(items: List<String>) {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) {
-        NavigationGraph(navController = navController)
+        NavigationGraph(navController = navController, items)
     }
 }
 
 @Composable
-fun NavigationGraph(navController: NavHostController) {
+fun NavigationGraph(navController: NavHostController, items: List<String>) {
     NavHost(navController, startDestination = NavigationItem.Home.screen_route) {
         composable(NavigationItem.Home.screen_route) {
-            HomeScreen()
+            HomeScreen(items)
         }
         composable(NavigationItem.Feeds.screen_route) {
-            HomeScreen()
+            HomeScreen(items)
         }
         composable(NavigationItem.Lists.screen_route) {
-            HomeScreen()
+            HomeScreen(items)
         }
         composable(NavigationItem.Settings.screen_route) {
-            HomeScreen()
+            HomeScreen(items)
         }
     }
 }
 
-@Composable
-fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.teal_700))
-            .wrapContentSize(Alignment.Center)
-    ) {
-        Text(
-            text = "Home Screen",
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp
-        )
-    }
-}
+
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = NavigationItem.listed()
 
     BottomNavigation(
-        backgroundColor = Purple700,
-        contentColor = Color.Black
+        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = MaterialTheme.colors.onPrimary
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -117,8 +99,8 @@ fun BottomNavigationBar(navController: NavController) {
                     )
                 },
                 label = { Text(text = title, fontSize = 12.sp) },
-                selectedContentColor = Color.Black,
-                unselectedContentColor = Color.Black.copy(0.4f),
+                selectedContentColor = MaterialTheme.colors.onPrimary,
+                unselectedContentColor = MaterialTheme.colors.onPrimary.copy(0.4f),
                 alwaysShowLabel = true,
                 selected = currentRoute == navigationItem.screen_route,
                 onClick = {
@@ -137,15 +119,17 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     OtteRssTheme {
-        MainScreenView()
+        MainScreenView(
+            listOf(
+//            "Feed 1",
+//            "Feed 2",
+//            "Feed 3",
+//            "Feed 4",
+            )
+        )
     }
 }

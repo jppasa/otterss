@@ -4,4 +4,7 @@
     <string name="feeds">Suscripciones</string>
     <string name="lists">Listas</string>
     <string name="settings">Ajustes</string>
+    <string name="no_items">¡Suscribete a un canal!</string>
+    <string name="input_url">Tengo una URL</string>
+    <string name="browse_feeds">Explorar canales</string>
 </resources>
