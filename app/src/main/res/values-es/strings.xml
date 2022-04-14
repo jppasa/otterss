@@ -11,4 +11,5 @@
     <string name="item_image">Imagen de %1$s</string>
     <string name="no_title">Sin título</string>
     <string name="feed_is_invalid">El Canal es inválido</string>
+    <string name="subscribe">Suscribirse</string>
 </resources>

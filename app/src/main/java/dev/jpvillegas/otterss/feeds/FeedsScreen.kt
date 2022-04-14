@@ -1,32 +1,30 @@
 package dev.jpvillegas.otterss.feeds
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +36,7 @@ import coil.compose.rememberImagePainter
 import dev.jpvillegas.otterss.R
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 import tw.ktrssreader.kotlin.model.channel.AutoMixChannelData
+import java.util.*
 
 @Composable
 fun FeedsScreen() {
@@ -93,7 +92,7 @@ fun FeedsContent(
         AnimatedVisibility(
             visible = feed != null && !searchInProgress,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-            exit = fadeOut()
+            exit = fadeOut() + slideOutVertically { it / 2}
         ) {
             FeedItem(feed)
         }
@@ -109,7 +108,7 @@ fun FeedItem(feed: AutoMixChannelData?) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         ConstraintLayout {
-            val (imageRef, titleRef, descriptionRef) = createRefs()
+            val (imageRef, titleRef, descriptionRef, subscribeBtnRef) = createRefs()
 
             val url = feed?.image?.url
             val title = feed?.title ?: stringResource(id = R.string.no_title)
@@ -123,7 +122,6 @@ fun FeedItem(feed: AutoMixChannelData?) {
                             top = parent.top,
                             bottom = parent.bottom,
                             topMargin = 16.dp,
-                            bottomMargin = 16.dp,
                             bias = 0f
                         )
                     }
@@ -171,6 +169,26 @@ fun FeedItem(feed: AutoMixChannelData?) {
                 }
             )
 
+            TextButton(
+                onClick = {
+
+                },
+                modifier = Modifier.constrainAs(subscribeBtnRef) {
+                    top.linkTo(imageRef.bottom, margin = 8.dp)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(parent.end, margin = 16.dp)
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.subscribe).uppercase(),
+                    style = TextStyle(
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 16.sp
+                    )
+                )
+            }
+
             val description = feed?.description
             if (description != null) {
                 Text(
@@ -187,7 +205,7 @@ fun FeedItem(feed: AutoMixChannelData?) {
 
                         linkTo(
                             top = titleRef.bottom,
-                            bottom = parent.bottom,
+                            bottom = subscribeBtnRef.top,
                             topMargin = 4.dp,
                             bottomMargin = 16.dp,
                             bias = 0f
@@ -195,8 +213,6 @@ fun FeedItem(feed: AutoMixChannelData?) {
                     }
                 )
             }
-
-
         }
     }
 }
