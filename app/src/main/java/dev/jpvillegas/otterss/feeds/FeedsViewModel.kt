@@ -21,12 +21,10 @@ class FeedsViewModel : ViewModel() {
         val errorMsg: String? = null
     )
 
-
     private val _feedUiState = MutableLiveData(FeedUiState())
 
     val feedUiState: LiveData<FeedUiState>
         get() = _feedUiState
-
 
     fun searchFeed(urlStr: String) {
         _feedUiState.value = _feedUiState.value?.copy(searchingProgress = true)
