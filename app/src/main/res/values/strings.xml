@@ -6,5 +6,9 @@
     <string name="settings">Settings</string>
     <string name="no_items">Subscribe to a feed!</string>
     <string name="input_url">I have a URL</string>
-    <string name="browse_feeds">Browse feeds</string>
+    <string name="search_feeds">Search feeds</string>
+    <string name="error_while_fetching_feed">Error while fetching feed</string>
+    <string name="item_image">%1$s image</string>
+    <string name="no_title">No title</string>
+    <string name="feed_is_invalid">Feed is invalid</string>
 </resources>

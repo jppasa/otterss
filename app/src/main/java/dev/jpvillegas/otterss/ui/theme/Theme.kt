@@ -17,12 +17,12 @@ private val LightColorPalette = lightColors(
     primary = Brown,
     primaryVariant = LightBrown,
     secondary = LightBlue100,
-    background = Beige,
+    background = LightBeige,
     surface = Beige,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onBackground = LightBlue700,
-    onSurface = LightBlue700,
+    onSurface = LightBlue600,
 )
 
 //private val EPaperWhiteColorPalette = lightColors(

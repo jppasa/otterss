@@ -6,5 +6,9 @@
     <string name="settings">Ajustes</string>
     <string name="no_items">¡Suscribete a un canal!</string>
     <string name="input_url">Tengo una URL</string>
-    <string name="browse_feeds">Explorar canales</string>
+    <string name="search_feeds">Buscar canales</string>
+    <string name="error_while_fetching_feed">Error al buscar el canal</string>
+    <string name="item_image">Imagen de %1$s</string>
+    <string name="no_title">Sin título</string>
+    <string name="feed_is_invalid">El Canal es inválido</string>
 </resources>

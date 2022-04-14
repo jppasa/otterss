@@ -19,6 +19,7 @@ val LightBlue900 = Color(0xFF000000)
 
 
 val Beige = Color(0xFFE4D1B9)
+val LightBeige = Color(0xFFF2E8DC)
 val LightBrown = Color(0xFFBE8C63)
 val Brown = Color(0xFFA97155)
 
