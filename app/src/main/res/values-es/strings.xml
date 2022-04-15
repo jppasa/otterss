@@ -12,4 +12,5 @@
     <string name="no_title">Sin título</string>
     <string name="feed_is_invalid">El Canal es inválido</string>
     <string name="subscribe">Suscribirse</string>
+    <string name="you_are_subscribed">Estas suscrito</string>
 </resources>

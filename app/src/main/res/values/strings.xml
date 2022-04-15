@@ -12,4 +12,5 @@
     <string name="no_title">No title</string>
     <string name="feed_is_invalid">Feed is invalid</string>
     <string name="subscribe">Subscribe</string>
+    <string name="you_are_subscribed">You are subscribed</string>
 </resources>

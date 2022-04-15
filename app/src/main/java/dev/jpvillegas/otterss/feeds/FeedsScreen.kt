@@ -17,14 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,22 +35,31 @@ import coil.compose.rememberImagePainter
 import dev.jpvillegas.otterss.R
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 import tw.ktrssreader.kotlin.model.channel.AutoMixChannelData
-import java.util.*
 
 @Composable
 fun FeedsScreen() {
-    val viewModel: FeedsViewModel = viewModel()
+    val viewModel: FeedsViewModel = viewModel(
+        factory = FeedsViewModelFactory(LocalContext.current)
+    )
+
     val uiState by viewModel.feedUiState.observeAsState()
 
     uiState?.let {
         FeedsContent(
+            feedUrl = it.searchUrl,
             searchInProgress = it.searchingProgress,
             error = it.error,
             errorMsg = it.errorMsg,
             invalidFeed = it.invalidFeed,
             feed = it.feed,
+            subscribed = it.subscribed,
             onSearchClicked = { text ->
                 viewModel.searchFeed(text)
+            },
+            onSubscribe = { url, feed ->
+                if (url != null) {
+                    viewModel.subscribeToFeed(urlStr = url, feed = feed)
+                }
             }
         )
     }
@@ -59,12 +67,15 @@ fun FeedsScreen() {
 
 @Composable
 fun FeedsContent(
+    feedUrl: String?,
     searchInProgress: Boolean,
     error: Boolean,
     errorMsg: String?,
     invalidFeed: Boolean,
     feed: AutoMixChannelData?,
-    onSearchClicked: (String) -> Unit
+    subscribed: Boolean,
+    onSearchClicked: (String) -> Unit,
+    onSubscribe: (String?, AutoMixChannelData) -> Unit
 ) {
 
     Column(
@@ -92,16 +103,21 @@ fun FeedsContent(
         AnimatedVisibility(
             visible = feed != null && !searchInProgress,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-            exit = fadeOut() + slideOutVertically { it / 2}
+            exit = fadeOut() + slideOutVertically { it / 2 }
         ) {
-            FeedItem(feed)
+            FeedItem(feedUrl, feed, subscribed, onSubscribe = onSubscribe)
         }
     }
 }
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun FeedItem(feed: AutoMixChannelData?) {
+fun FeedItem(
+    feedUrl: String?,
+    feed: AutoMixChannelData?,
+    subscribed: Boolean,
+    onSubscribe: (String?, AutoMixChannelData) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -110,7 +126,7 @@ fun FeedItem(feed: AutoMixChannelData?) {
         ConstraintLayout {
             val (imageRef, titleRef, descriptionRef, subscribeBtnRef) = createRefs()
 
-            val url = feed?.image?.url
+            val imageUrl = feed?.image?.url
             val title = feed?.title ?: stringResource(id = R.string.no_title)
 
             Box(
@@ -126,9 +142,9 @@ fun FeedItem(feed: AutoMixChannelData?) {
                         )
                     }
             ) {
-                if (url != null) {
+                if (imageUrl != null) {
                     Image(
-                        painter = rememberImagePainter(url),
+                        painter = rememberImagePainter(imageUrl),
                         contentDescription = stringResource(id = R.string.item_image, title),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -169,24 +185,35 @@ fun FeedItem(feed: AutoMixChannelData?) {
                 }
             )
 
-            TextButton(
-                onClick = {
-
-                },
+            Box(
                 modifier = Modifier.constrainAs(subscribeBtnRef) {
                     top.linkTo(imageRef.bottom, margin = 8.dp)
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end, margin = 16.dp)
                 }
             ) {
-                Text(
-                    text = stringResource(id = R.string.subscribe).uppercase(),
-                    style = TextStyle(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 16.sp
+                if (subscribed) {
+                    Text(
+                        text = stringResource(id = R.string.you_are_subscribed),
+                        style = TextStyle(
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colors.secondary
+                        )
                     )
-                )
+                } else if (feed != null) {
+                    TextButton(onClick = { onSubscribe(feedUrl, feed) }) {
+                        Text(
+                            text = stringResource(id = R.string.subscribe).uppercase(),
+                            style = TextStyle(
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
+                }
             }
 
             val description = feed?.description
@@ -304,7 +331,7 @@ private val testFeed = AutoMixChannelData(
 @Composable
 fun FeedItemPreview() {
     OtteRssTheme {
-        FeedItem(testFeed)
+        FeedItem("url", testFeed, false, onSubscribe = { _, _ -> })
     }
 }
 
@@ -313,12 +340,15 @@ fun FeedItemPreview() {
 fun FeedsScreenPreview() {
     OtteRssTheme {
         FeedsContent(
+            feedUrl = "url",
             searchInProgress = false,
             error = false,
             errorMsg = null,
             invalidFeed = false,
             feed = testFeed,
-            onSearchClicked = {}
+            subscribed = true,
+            onSearchClicked = {},
+            onSubscribe = { _, _ -> }
         )
     }
 }

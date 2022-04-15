@@ -8,6 +8,8 @@ import androidx.room.TypeConverters
 import dev.jpvillegas.otterss.db.converters.FeedCategoryConverter
 import dev.jpvillegas.otterss.db.converters.IntListConverter
 import dev.jpvillegas.otterss.db.converters.StringListConverter
+import dev.jpvillegas.otterss.db.daos.FeedDao
+import dev.jpvillegas.otterss.db.daos.FeedItemDao
 import dev.jpvillegas.otterss.db.entities.FeedEntity
 import dev.jpvillegas.otterss.db.entities.FeedItemEntity
 
@@ -24,14 +26,16 @@ import dev.jpvillegas.otterss.db.entities.FeedItemEntity
     StringListConverter::class,
 )
 abstract class AppDb : RoomDatabase() {
+    abstract fun feedDao(): FeedDao
+    abstract fun feedItemDao(): FeedItemDao
 
     companion object {
         private const val DATABASE_NAME = "otterss_db"
         private var instance: AppDb? = null
         private val initLock = Any()
 
-        fun getInstance(context: Context) {
-            synchronized(initLock) {
+        fun getInstance(context: Context): AppDb {
+            return synchronized(initLock) {
                 instance ?: databaseBuilder(
                     context.applicationContext,
                     AppDb::class.java,

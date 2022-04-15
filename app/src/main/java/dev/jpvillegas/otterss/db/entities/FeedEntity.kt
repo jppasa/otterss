@@ -25,11 +25,11 @@ class FeedEntity(
     val generator: String?,
     val docs: String?,
     @Embedded
-    val cloud: CloudEntity?,
+    val cloud: FeedCloud?,
     val ttl: Int?,
     val rating: String?,
     @Embedded
-    val textInput: TextInputEntity?,
+    val textInput: FeedTextInput?,
     val skipHours: List<Int>?,
     val skipDays: List<String>?,
 //    val items: List<FeedItemEntity>?,
@@ -38,7 +38,7 @@ class FeedEntity(
     val email: String?,
     val author: String?,
     @Embedded
-    val owner: OwnerEntity?,
+    val owner: FeedOwner?,
     val type: String?,
     val newFeedUrl: String?,
     val block: Boolean?,
@@ -66,7 +66,7 @@ class FeedCategory(
     val domain: String?,
 )
 
-class CloudEntity(
+class FeedCloud(
     @ColumnInfo(name = "cloud-domain")
     val domain: String?,
     @ColumnInfo(name = "cloud-port")
@@ -79,7 +79,7 @@ class CloudEntity(
     val protocol: String?,
 )
 
-class TextInputEntity(
+class FeedTextInput(
     @ColumnInfo(name = "textInput-title")
     val title: String?,
     @ColumnInfo(name = "textInput-description")
@@ -90,7 +90,7 @@ class TextInputEntity(
     val link: String?,
 )
 
-class OwnerEntity(
+class FeedOwner(
     @ColumnInfo(name = "owner-name")
     val name: String?,
     @ColumnInfo(name = "owner-email")
