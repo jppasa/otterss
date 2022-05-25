@@ -26,3 +26,12 @@ val Brown = Color(0xFFA97155)
 // E-Paper Colors
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
+
+// Main Theme Colors
+val DarkGreyPrimary = Color(0xFF616161)
+val GreyPrimary = Color(0xFF9E9E9E)
+val LightGreyPrimary = Color(0xFFF5F5F5)
+val OrangeAccent = Color(0xFFFF5722)
+val GreyTextPrimary = Color(0xFF212121)
+val GreyTextSecondary = Color(0xFF757575)
+val GreyDivider = Color(0xFFBDBDBD)

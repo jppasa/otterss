@@ -22,13 +22,38 @@ class FeedsViewModel(
         val subscribed: Boolean = false,
         val invalidFeed: Boolean = false,
         val error: Boolean = false,
-        val errorMsg: String? = null
+        val errorMsg: String? = null,
+        val defaultFeeds: List<Feed> = emptyList(),
+        val defaultFeedsLoading: Boolean = true
     )
 
     private val _feedUiState = MutableLiveData(FeedUiState())
 
     val feedUiState: LiveData<FeedUiState>
         get() = _feedUiState
+
+    init {
+        loadDefaults()
+    }
+
+    private fun loadDefaults() {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                DefaultFeeds.urlList.mapNotNull { url ->
+                    if (feedDbRepository.isSubscribed(url)) null
+                    else when (val feedResult = loadFeed(url)) {
+                        is FetchFeedResult.Success -> Feed(url, feedResult.feed)
+                        else -> null
+                    }
+                }
+            }
+
+            _feedUiState.value = _feedUiState.value?.copy(
+                defaultFeeds = result,
+                defaultFeedsLoading = false
+            )
+        }
+    }
 
     fun searchFeed(urlStr: String) {
         _feedUiState.value = _feedUiState.value?.copy(
@@ -37,17 +62,7 @@ class FeedsViewModel(
         )
 
         viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                try {
-                    val result = Reader.coRead<AutoMixChannelData>(url = urlStr)
-                    FetchFeedResult.Success(result)
-                } catch (e: XmlPullParserException) {
-                    FetchFeedResult.XmlError(e.message)
-                } catch (e: Exception) {
-                    FetchFeedResult.Error(e.message)
-                }
-            }
-
+            val result = loadFeed(urlStr)
             val subscribed = feedDbRepository.isSubscribed(urlStr)
 
             when (result) {
@@ -78,12 +93,31 @@ class FeedsViewModel(
         }
     }
 
-    fun subscribeToFeed(urlStr: String, feed: AutoMixChannelData) {
+    private suspend fun loadFeed(urlStr: String) = withContext(Dispatchers.IO) {
+        try {
+            val result = Reader.coRead<AutoMixChannelData>(url = urlStr)
+            FetchFeedResult.Success(result)
+        } catch (e: XmlPullParserException) {
+            FetchFeedResult.XmlError(e.message)
+        } catch (e: Exception) {
+            FetchFeedResult.Error(e.message)
+        }
+    }
+
+
+    fun subscribeToFeed(urlStr: String, feed: AutoMixChannelData, fromSearch: Boolean) {
         viewModelScope.launch {
             val id = feedDbRepository.insertAutoMixChannelDataAsFeed(urlStr, feed)
 
             if (id > 0) {
-                _feedUiState.value = _feedUiState.value?.copy(subscribed = true)
+                if (fromSearch) {
+                    _feedUiState.value = _feedUiState.value?.copy(subscribed = true)
+                } else {
+                    val newFeeds = _feedUiState.value?.defaultFeeds?.filter { it.urlStr != urlStr }
+                    _feedUiState.value = _feedUiState.value?.copy(
+                        defaultFeeds = newFeeds ?: emptyList()
+                    )
+                }
             }
         }
     }
@@ -109,3 +143,5 @@ class FeedsViewModelFactory(
         return FeedsViewModel(feedDbRepository) as T
     }
 }
+
+data class Feed(val urlStr: String, val autoMixChannelData: AutoMixChannelData)

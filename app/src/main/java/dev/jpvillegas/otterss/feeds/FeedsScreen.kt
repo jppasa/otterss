@@ -5,6 +5,8 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -53,12 +55,14 @@ fun FeedsScreen() {
             invalidFeed = it.invalidFeed,
             feed = it.feed,
             subscribed = it.subscribed,
+            defaultFeeds = it.defaultFeeds,
+            defaultFeedsLoading = it.defaultFeedsLoading,
             onSearchClicked = { text ->
                 viewModel.searchFeed(text)
             },
-            onSubscribe = { url, feed ->
+            onSubscribe = { url, feed, fromSearch ->
                 if (url != null) {
-                    viewModel.subscribeToFeed(urlStr = url, feed = feed)
+                    viewModel.subscribeToFeed(urlStr = url, feed = feed, fromSearch = fromSearch)
                 }
             }
         )
@@ -74,39 +78,97 @@ fun FeedsContent(
     invalidFeed: Boolean,
     feed: AutoMixChannelData?,
     subscribed: Boolean,
+    defaultFeeds: List<Feed>,
+    defaultFeedsLoading: Boolean,
     onSearchClicked: (String) -> Unit,
-    onSubscribe: (String?, AutoMixChannelData) -> Unit
+    onSubscribe: (String?, AutoMixChannelData, Boolean) -> Unit
 ) {
 
-    Column(
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
     ) {
-        SearchBar(onSearchClicked = onSearchClicked)
-
-        AnimatedVisibility(visible = searchInProgress) {
-            CircularProgressIndicator()
+        item {
+            SearchBar(onSearchClicked = onSearchClicked)
         }
 
-        when {
-            error -> {
-                Text(text = stringResource(id = R.string.error_while_fetching_feed))
-                Log.e("FETCH_ERROR", errorMsg.toString())
-            }
-            invalidFeed -> {
-                Text(text = stringResource(id = R.string.feed_is_invalid))
+        item {
+            AnimatedVisibility(visible = searchInProgress) {
+                CircularProgressIndicator()
             }
         }
 
-        AnimatedVisibility(
-            visible = feed != null && !searchInProgress,
-            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-            exit = fadeOut() + slideOutVertically { it / 2 }
-        ) {
-            FeedItem(feedUrl, feed, subscribed, onSubscribe = onSubscribe)
+        item {
+            when {
+                error -> {
+                    Text(text = stringResource(id = R.string.error_while_fetching_feed))
+                    Log.e("FETCH_ERROR", errorMsg.toString())
+                }
+                invalidFeed -> {
+                    Text(text = stringResource(id = R.string.feed_is_invalid))
+                }
+            }
         }
+
+        item {
+            AnimatedVisibility(
+                visible = feed != null && !searchInProgress,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+                exit = fadeOut() + slideOutVertically { it / 2 }
+            ) {
+                FeedItem(feedUrl, feed, subscribed, searched = false, onSubscribe = onSubscribe)
+            }
+        }
+
+        item {
+            Text(
+                text = stringResource(id = R.string.default_feeds),
+                fontSize = 14.sp,
+                style = TextStyle.Default.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                ),
+                textAlign = TextAlign.Start,
+            )
+        }
+
+        item {
+            AnimatedVisibility(visible = defaultFeedsLoading) {
+                CircularProgressIndicator()
+            }
+        }
+
+        if (defaultFeeds.isNotEmpty()) {
+            items(defaultFeeds) {
+                AnimatedVisibility(
+                    visible = !defaultFeedsLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+                    exit = fadeOut() + slideOutVertically { it / 2 }
+                ) {
+                    FeedItem(
+                        feedUrl = it.urlStr,
+                        feed = it.autoMixChannelData,
+                        subscribed = false,
+                        searched = false,
+                        onSubscribe = onSubscribe
+                    )
+                }
+            }
+        }
+
+//        AnimatedVisibility(
+//            visible = feed == null && !searchInProgress,
+//            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+//            exit = fadeOut() + slideOutVertically { it / 2 }
+//        ) {
+//            LazyColumn {
+//
+//                items()
+//                FeedItem(feedUrl, feed, subscribed, onSubscribe = onSubscribe)
+//            }
+//        }
     }
 }
 
@@ -116,7 +178,8 @@ fun FeedItem(
     feedUrl: String?,
     feed: AutoMixChannelData?,
     subscribed: Boolean,
-    onSubscribe: (String?, AutoMixChannelData) -> Unit
+    searched: Boolean,
+    onSubscribe: (String?, AutoMixChannelData, Boolean) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -203,7 +266,7 @@ fun FeedItem(
                         )
                     )
                 } else if (feed != null) {
-                    TextButton(onClick = { onSubscribe(feedUrl, feed) }) {
+                    TextButton(onClick = { onSubscribe(feedUrl, feed, searched) }) {
                         Text(
                             text = stringResource(id = R.string.subscribe).uppercase(),
                             style = TextStyle(
@@ -331,7 +394,12 @@ private val testFeed = AutoMixChannelData(
 @Composable
 fun FeedItemPreview() {
     OtteRssTheme {
-        FeedItem("url", testFeed, false, onSubscribe = { _, _ -> })
+        FeedItem(
+            "url",
+            testFeed,
+            subscribed = false,
+            searched = false,
+            onSubscribe = { _, _, _ -> })
     }
 }
 
@@ -347,8 +415,10 @@ fun FeedsScreenPreview() {
             invalidFeed = false,
             feed = testFeed,
             subscribed = true,
+            defaultFeeds = emptyList(),
+            defaultFeedsLoading = false,
             onSearchClicked = {},
-            onSubscribe = { _, _ -> }
+            onSubscribe = { _, _, _ -> }
         )
     }
 }

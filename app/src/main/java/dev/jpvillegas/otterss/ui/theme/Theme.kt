@@ -13,7 +13,7 @@ private val DarkColorPalette = darkColors(
     secondary = Teal200
 )
 
-private val LightColorPalette = lightColors(
+private val BrownColorPalette = lightColors(
     primary = Brown,
     primaryVariant = LightBrown,
     secondary = LightBlue100,
@@ -24,6 +24,20 @@ private val LightColorPalette = lightColors(
     onBackground = LightBlue700,
     onSurface = LightBlue600,
 )
+
+private val LightColorPalette = lightColors(
+    primary = GreyPrimary,
+    primaryVariant = DarkGreyPrimary,
+    secondary = OrangeAccent,
+    background = LightGreyPrimary,
+    surface = White,
+    onPrimary = GreyTextPrimary,
+    onSecondary = White,
+    onBackground = Black,
+    onSurface = Black,
+)
+
+
 
 //private val EPaperWhiteColorPalette = lightColors(
 //    primary = ,

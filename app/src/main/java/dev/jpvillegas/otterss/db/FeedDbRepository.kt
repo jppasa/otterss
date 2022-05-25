@@ -1,8 +1,5 @@
 package dev.jpvillegas.otterss.db
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
-import androidx.room.PrimaryKey
 import dev.jpvillegas.otterss.db.daos.FeedDao
 import dev.jpvillegas.otterss.db.daos.FeedItemDao
 import dev.jpvillegas.otterss.db.entities.*
