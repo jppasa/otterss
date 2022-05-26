@@ -4,6 +4,7 @@ import dev.jpvillegas.otterss.db.daos.FeedDao
 import dev.jpvillegas.otterss.db.daos.FeedItemDao
 import dev.jpvillegas.otterss.db.entities.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import tw.ktrssreader.kotlin.model.channel.*
 import tw.ktrssreader.kotlin.model.item.Category
@@ -22,6 +23,14 @@ class FeedDbRepository(
 
     suspend fun isSubscribed(url: String): Boolean = withContext(Dispatchers.IO) {
         feedDao.getByUrl(url) != null
+    }
+
+    fun feedsAsFlow(): Flow<List<FeedEntity>> {
+        return feedDao.allAsFlow()
+    }
+
+    fun itemsAsFlow(): Flow<List<FeedItemEntity>> {
+        return feedItemDao.allAsFlow()
     }
 }
 

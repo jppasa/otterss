@@ -197,12 +197,7 @@ fun FeedItem(
                     .size(64.dp)
                     .constrainAs(imageRef) {
                         start.linkTo(parent.start, margin = 16.dp)
-                        linkTo(
-                            top = parent.top,
-                            bottom = parent.bottom,
-                            topMargin = 16.dp,
-                            bias = 0f
-                        )
+                        top.linkTo(parent.top, margin = 16.dp)
                     }
             ) {
                 if (imageUrl != null) {
@@ -399,7 +394,8 @@ fun FeedItemPreview() {
             testFeed,
             subscribed = false,
             searched = false,
-            onSubscribe = { _, _, _ -> })
+            onSubscribe = { _, _, _ -> }
+        )
     }
 }
 

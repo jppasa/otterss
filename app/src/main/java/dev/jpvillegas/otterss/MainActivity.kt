@@ -59,16 +59,16 @@ fun NavigationGraph(
 ) {
     NavHost(navController, startDestination = NavigationItem.Home.screen_route) {
         composable(NavigationItem.Home.screen_route) {
-            HomeScreen(items)
+            HomeScreen()
         }
         composable(NavigationItem.Feeds.screen_route) {
             FeedsScreen()
         }
         composable(NavigationItem.Lists.screen_route) {
-            HomeScreen(items)
+            HomeScreen()
         }
         composable(NavigationItem.Settings.screen_route) {
-            HomeScreen(items)
+            HomeScreen()
         }
     }
 }
