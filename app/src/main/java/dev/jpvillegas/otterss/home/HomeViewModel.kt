@@ -30,9 +30,12 @@ class HomeViewModel(
     val itemsFlow = feedDbRepository.feedsAsFlow()
         .flowOn(Dispatchers.IO)
         .map { list ->
-            list.mapNotNull {
-                Reader.coRead<AutoMixChannelData>(it.url).items
-            }.flatMap { it.asIterable() }.sortedByDescending { it.pubDate }
+            val result = list
+                .mapNotNull { Reader.coRead<AutoMixChannelData>(it.url).items }
+                .flatMap { it.asIterable() }
+                .sortedByDescending {
+                    it.pubDate.parseDate()
+                }
 
             loading.value = false
             result
