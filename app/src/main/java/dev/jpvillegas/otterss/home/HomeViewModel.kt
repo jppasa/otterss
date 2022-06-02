@@ -10,11 +10,9 @@ import dev.jpvillegas.otterss.db.FeedDbRepository
 import dev.jpvillegas.otterss.db.entities.FeedEntity
 import dev.jpvillegas.otterss.db.entities.FeedItemEntity
 import dev.jpvillegas.otterss.feeds.FeedsViewModel
+import dev.jpvillegas.otterss.util.DateUtils.parseDate
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.forEach
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import tw.ktrssreader.Reader
@@ -25,7 +23,9 @@ class HomeViewModel(
     private val feedDbRepository: FeedDbRepository
 ) : ViewModel() {
 
-    val itemsInDbFlow = feedDbRepository.itemsAsFlow()
+    //val itemsInDbFlow = feedDbRepository.itemsAsFlow()
+
+    val loading = MutableStateFlow(true)
 
     val itemsFlow = feedDbRepository.feedsAsFlow()
         .flowOn(Dispatchers.IO)
@@ -33,6 +33,9 @@ class HomeViewModel(
             list.mapNotNull {
                 Reader.coRead<AutoMixChannelData>(it.url).items
             }.flatMap { it.asIterable() }.sortedByDescending { it.pubDate }
+
+            loading.value = false
+            result
         }
         .flowOn(Dispatchers.IO)
 

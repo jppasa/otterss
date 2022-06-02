@@ -14,4 +14,5 @@
     <string name="subscribe">Suscribirse</string>
     <string name="you_are_subscribed">Estas suscrito</string>
     <string name="default_feeds">Canales predeterminados</string>
+    <string name="loading">Cargando…</string>
 </resources>
