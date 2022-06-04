@@ -15,4 +15,8 @@
     <string name="you_are_subscribed">You are subscribed</string>
     <string name="default_feeds">Default Feeds</string>
     <string name="loading">Loading…</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_ago">days ago</string>
+    <string name="articles">Articles</string>
 </resources>
