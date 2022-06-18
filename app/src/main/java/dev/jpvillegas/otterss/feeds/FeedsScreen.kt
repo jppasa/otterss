@@ -118,7 +118,6 @@ fun FeedsContent(
                 fontSize = 14.sp,
                 style = TextStyle.Default.copy(
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
                 ),
                 textAlign = TextAlign.Start,
             )
@@ -222,7 +221,6 @@ fun FeedItem(
                 fontSize = 20.sp,
                 style = TextStyle.Default.copy(
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
                 ),
                 textAlign = TextAlign.Start,
                 modifier = Modifier.constrainAs(titleRef) {
@@ -244,7 +242,6 @@ fun FeedItem(
                     Text(
                         text = stringResource(id = R.string.you_are_subscribed),
                         style = TextStyle(
-                            fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 12.sp,
                             color = MaterialTheme.colors.secondary
@@ -255,9 +252,7 @@ fun FeedItem(
                         Text(
                             text = stringResource(id = R.string.subscribe).uppercase(),
                             style = TextStyle(
-                                fontFamily = FontFamily.Monospace,
                                 fontWeight = FontWeight.ExtraBold,
-                                fontSize = 16.sp
                             )
                         )
                     }
@@ -270,7 +265,6 @@ fun FeedItem(
                     text = description,
                     style = TextStyle(
                         color = MaterialTheme.colors.onSurface,
-                        fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Medium
                     ),
                     modifier = Modifier.constrainAs(descriptionRef) {

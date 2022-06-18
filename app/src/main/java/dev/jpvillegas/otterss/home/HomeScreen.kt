@@ -17,12 +17,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +31,8 @@ import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 import dev.jpvillegas.otterss.util.DateUtils.contextualDate
 import dev.jpvillegas.otterss.util.DateUtils.parseDate
 import tw.ktrssreader.kotlin.model.item.AutoMixItem
+import tw.ktrssreader.kotlin.model.item.AutoMixItemData
+import tw.ktrssreader.kotlin.model.item.Category
 
 
 @Composable
@@ -72,7 +73,6 @@ fun HomeScreen(
                 Text(
                     text = stringResource(id = R.string.articles),
                     fontSize = 24.sp,
-                    fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -104,16 +104,6 @@ fun FeedItem(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = item.title ?: item.simpleTitle ?: "n/a",
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-                color = MaterialTheme.colors.onBackground,
-                textAlign = TextAlign.Start,
-                fontSize = 18.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             item.pubDate.parseDate()?.let {
                 Text(
@@ -124,13 +114,33 @@ fun FeedItem(
                         daysAgoStr = stringResource(id = R.string.days_ago),
                     ),
                     fontSize = 12.sp,
-                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.align(alignment = Alignment.End)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Text(
+                text = item.title ?: item.simpleTitle ?: "n/a",
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colors.onBackground,
+                textAlign = TextAlign.Start,
+                fontSize = 18.sp
+            )
+
+            item.description?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    fontWeight = FontWeight.Light,
+                    color = MaterialTheme.colors.onBackground,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
             item.categories?.mapNotNull { it.name }?.let {
                 if (it.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row {
                         Label(text = it.first())
                         Spacer(modifier = Modifier.width(4.dp))
@@ -160,7 +170,6 @@ fun Label(text: String) {
         Text(
             text = text,
             fontSize = 12.sp,
-            fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.ExtraBold
         )
     }
@@ -269,7 +278,7 @@ fun AddFeedDialogContent(
 
 @Preview(showBackground = true)
 @Composable
-fun HomePreview() {
+fun HomeLoadingPreview() {
     OtteRssTheme {
         HomeScreen(
             loading = true,
@@ -280,16 +289,65 @@ fun HomePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun DialogPreview() {
+fun HomePreview() {
     OtteRssTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(20.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            AddFeedDialogContent()
-        }
+        HomeScreen(
+            loading = false,
+            feedItems = listOf(
+                autoMixItemData(
+                    title = "Title 1",
+                    description = "Item description",
+                    pubDate = "Sun, 18 Jun 2022 17:30:15"
+                ),
+                autoMixItemData(
+                    title = "Title 2",
+                    description = "Item description",
+                    pubDate = "Sun, 17 Jun 2022 17:30:15"
+                ),
+                autoMixItemData(
+                    title = "Title 3",
+                    description = "Item description",
+                    pubDate = "Sun, 14 Jun 2022 17:30:15"
+                ),
+                autoMixItemData(
+                    title = "Title 4",
+                    description = "Item description",
+                    pubDate = "Sun, 01 Jun 2022 17:30:15"
+                ),
+            )
+        ) {}
     }
+}
+
+fun autoMixItemData(
+    title: String,
+    description: String,
+    pubDate: String
+): AutoMixItemData {
+    return AutoMixItemData(
+        title = title,
+        enclosure = null,
+        guid = null,
+        pubDate = pubDate,
+        description = description,
+        link = null,
+        author = null,
+        categories = listOf(
+            Category("Android!", "developer.android.com"),
+            Category("Android 2!", "developer.android.com"),
+        ),
+        comments = null,
+        source = null,
+        simpleTitle = null,
+        duration = null,
+        image = null,
+        explicit = null,
+        episode = null,
+        season = null,
+        episodeType = null,
+        block = null,
+        summary = null,
+        subtitle = null,
+        keywords = null,
+    )
 }
