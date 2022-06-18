@@ -1,20 +1,44 @@
-package dev.jpvillegas.otterss.feeds
+package dev.jpvillegas.otterss
 
 import android.content.Context
 import androidx.lifecycle.*
 import dev.jpvillegas.otterss.db.AppDb
 import dev.jpvillegas.otterss.db.FeedDbRepository
+import dev.jpvillegas.otterss.feeds.DefaultFeeds
+import dev.jpvillegas.otterss.util.DateUtils.parseDate
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xmlpull.v1.XmlPullParserException
 import tw.ktrssreader.Reader
 import tw.ktrssreader.kotlin.model.channel.AutoMixChannelData
 
-class FeedsViewModel(
+class MainViewModel(
     private val feedDbRepository: FeedDbRepository
 ) : ViewModel() {
 
+    // Home
+    val loading = MutableStateFlow(true)
+
+    val itemsFlow = feedDbRepository.feedsAsFlow()
+        .flowOn(Dispatchers.IO)
+        .map { list ->
+            val result = list
+                .mapNotNull { Reader.coRead<AutoMixChannelData>(it.url).items }
+                .flatMap { it.asIterable() }
+                .sortedByDescending {
+                    it.pubDate.parseDate()
+                }
+
+            loading.value = false
+            result
+        }
+        .flowOn(Dispatchers.IO)
+
+    // Feeds
     data class FeedUiState(
         val searchUrl: String? = null,
         val searchingProgress: Boolean = false,
@@ -129,7 +153,8 @@ class FeedsViewModel(
     }
 }
 
-class FeedsViewModelFactory(
+
+class MainViewModelFactory(
     private val context: Context
 ) : ViewModelProvider.Factory {
 
@@ -140,7 +165,7 @@ class FeedsViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return FeedsViewModel(feedDbRepository) as T
+        return MainViewModel(feedDbRepository) as T
     }
 }
 

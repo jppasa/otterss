@@ -3,19 +3,23 @@ package dev.jpvillegas.otterss
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainScreenView(listOf())
+                    MainScreenView()
                 }
             }
         }
@@ -43,36 +47,55 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreenView(items: List<String>) {
+fun MainScreenView() {
+    val viewModel: MainViewModel = viewModel(
+        factory = MainViewModelFactory(LocalContext.current)
+    )
+
     val navController = rememberNavController()
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) {
-        NavigationGraph(navController = navController, items)
+
+        val homeLoading by viewModel.loading.collectAsState(initial = true)
+        val homeFeedItems by viewModel.itemsFlow.collectAsState(initial = emptyList())
+
+        val feedUiState by viewModel.feedUiState.observeAsState()
+
+        NavHost(
+            navController,
+            startDestination = NavigationItem.Home.screen_route,
+            modifier = Modifier.padding(paddingValues = it)
+        ) {
+            composable(NavigationItem.Home.screen_route) {
+                HomeScreen(homeLoading, homeFeedItems) {
+                    navController.navigate(NavigationItem.Search.screen_route)
+                }
+            }
+            composable(NavigationItem.Search.screen_route) {
+                FeedsScreen(
+                    uiState = feedUiState,
+                    onSearchClicked = { text ->
+                        viewModel.searchFeed(text)
+                    },
+                    onSubscribe = { url, feed, fromSearch ->
+                        if (url != null) {
+                            viewModel.subscribeToFeed(
+                                urlStr = url,
+                                feed = feed,
+                                fromSearch = fromSearch
+                            )
+                        }
+                    }
+                )
+            }
+            composable(NavigationItem.Settings.screen_route) {
+
+            }
+        }
     }
 }
-
-@Composable
-fun NavigationGraph(
-    navController: NavHostController,
-    items: List<String>,
-) {
-    NavHost(navController, startDestination = NavigationItem.Home.screen_route) {
-        composable(NavigationItem.Home.screen_route) {
-            HomeScreen()
-        }
-        composable(NavigationItem.Feeds.screen_route) {
-            FeedsScreen()
-        }
-        composable(NavigationItem.Lists.screen_route) {
-            HomeScreen()
-        }
-        composable(NavigationItem.Settings.screen_route) {
-            HomeScreen()
-        }
-    }
-}
-
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -80,7 +103,6 @@ fun BottomNavigationBar(navController: NavController) {
 
     Card(
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-        modifier = Modifier.padding(top = 8.dp)
     ) {
         BottomNavigation(
             backgroundColor = MaterialTheme.colors.primary,
@@ -125,13 +147,6 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun DefaultPreview() {
     OtteRssTheme {
-        MainScreenView(
-            listOf(
-//            "Feed 1",
-//            "Feed 2",
-//            "Feed 3",
-//            "Feed 4",
-            )
-        )
+        MainScreenView()
     }
 }

@@ -1,5 +1,7 @@
 package dev.jpvillegas.otterss.home
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -10,7 +12,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.jpvillegas.otterss.R
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 import dev.jpvillegas.otterss.util.DateUtils.contextualDate
@@ -32,14 +35,11 @@ import tw.ktrssreader.kotlin.model.item.AutoMixItem
 
 
 @Composable
-fun HomeScreen() {
-    val viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(LocalContext.current)
-    )
-
-    val loading by viewModel.loading.collectAsState(initial = true)
-    val feedItems by viewModel.itemsFlow.collectAsState(initial = emptyList())
-
+fun HomeScreen(
+    loading: Boolean,
+    feedItems: List<AutoMixItem>,
+    onFeedsClicked: () -> Unit
+) {
     if (loading) {
         LoadingHome()
     }
@@ -49,7 +49,7 @@ fun HomeScreen() {
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
         exit = fadeOut() + slideOutVertically { it / 2 }
     ) {
-        EmptyListHome()
+        EmptyListHome(onFeedsClicked)
     }
 
     AnimatedVisibility(
@@ -83,7 +83,7 @@ fun HomeScreen() {
             items(feedItems) {
                 FeedItem(it, onItemClick = { item ->
                     Log.d("ITEMCLICK", "$item")
-                    //context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.link)))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.link)))
                 })
             }
         }
@@ -188,7 +188,9 @@ fun LoadingHome() {
 }
 
 @Composable
-fun EmptyListHome() {
+fun EmptyListHome(
+    onFeedsClicked: () -> Unit
+) {
     val openUrlDialog = remember { mutableStateOf(false) }
 
     Column(
@@ -208,9 +210,7 @@ fun EmptyListHome() {
         Spacer(Modifier.size(16.dp))
 
         Button(
-            onClick = {
-
-            }
+            onClick = onFeedsClicked
         ) {
             Text(
                 text = stringResource(id = R.string.search_feeds),
@@ -271,7 +271,10 @@ fun AddFeedDialogContent(
 @Composable
 fun HomePreview() {
     OtteRssTheme {
-        HomeScreen()
+        HomeScreen(
+            loading = true,
+            feedItems = emptyList()
+        ) {}
     }
 }
 

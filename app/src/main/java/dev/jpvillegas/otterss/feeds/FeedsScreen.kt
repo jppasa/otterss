@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -31,21 +28,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import dev.jpvillegas.otterss.Feed
+import dev.jpvillegas.otterss.MainViewModel
 import dev.jpvillegas.otterss.R
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 import tw.ktrssreader.kotlin.model.channel.AutoMixChannelData
 
 @Composable
-fun FeedsScreen() {
-    val viewModel: FeedsViewModel = viewModel(
-        factory = FeedsViewModelFactory(LocalContext.current)
-    )
-
-    val uiState by viewModel.feedUiState.observeAsState()
-
+fun FeedsScreen(
+    uiState: MainViewModel.FeedUiState?,
+    onSearchClicked: (String) -> Unit,
+    onSubscribe: (String?, AutoMixChannelData, Boolean) -> Unit
+) {
     uiState?.let {
         FeedsContent(
             feedUrl = it.searchUrl,
@@ -57,14 +53,8 @@ fun FeedsScreen() {
             subscribed = it.subscribed,
             defaultFeeds = it.defaultFeeds,
             defaultFeedsLoading = it.defaultFeedsLoading,
-            onSearchClicked = { text ->
-                viewModel.searchFeed(text)
-            },
-            onSubscribe = { url, feed, fromSearch ->
-                if (url != null) {
-                    viewModel.subscribeToFeed(urlStr = url, feed = feed, fromSearch = fromSearch)
-                }
-            }
+            onSearchClicked = onSearchClicked,
+            onSubscribe = onSubscribe
         )
     }
 }
