@@ -31,14 +31,14 @@ import androidx.constraintlayout.compose.Dimension
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import dev.jpvillegas.otterss.Feed
-import dev.jpvillegas.otterss.MainViewModel
+import dev.jpvillegas.otterss.FeedsViewModel
 import dev.jpvillegas.otterss.R
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 import tw.ktrssreader.kotlin.model.channel.AutoMixChannelData
 
 @Composable
 fun FeedsScreen(
-    uiState: MainViewModel.FeedUiState?,
+    uiState: FeedsViewModel.FeedUiState?,
     onSearchClicked: (String) -> Unit,
     onSubscribe: (String?, AutoMixChannelData, Boolean) -> Unit
 ) {
