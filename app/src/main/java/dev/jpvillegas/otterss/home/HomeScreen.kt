@@ -34,7 +34,6 @@ import tw.ktrssreader.kotlin.model.item.AutoMixItem
 import tw.ktrssreader.kotlin.model.item.AutoMixItemData
 import tw.ktrssreader.kotlin.model.item.Category
 
-
 @Composable
 fun HomeScreen(
     loading: Boolean,

@@ -33,6 +33,7 @@ import dev.jpvillegas.otterss.feeds.FeedsScreen
 import dev.jpvillegas.otterss.home.HomeScreen
 import dev.jpvillegas.otterss.home.HomeViewModel
 import dev.jpvillegas.otterss.navigation.NavigationItem
+import dev.jpvillegas.otterss.settings.SettingsScreen
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 
 class MainActivity : ComponentActivity() {
@@ -101,7 +102,7 @@ fun MainScreenView() {
                 )
             }
             composable(NavigationItem.Settings.screen_route) {
-
+                SettingsScreen()
             }
         }
     }

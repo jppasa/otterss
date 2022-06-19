@@ -19,4 +19,7 @@
     <string name="yesterday">Ayer</string>
     <string name="days_ago">días atrás</string>
     <string name="articles">Artículos</string>
+    <string name="theme">Estilo</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
 </resources>
