@@ -18,7 +18,10 @@ import dev.jpvillegas.otterss.R
 import dev.jpvillegas.otterss.ui.theme.OtteRssTheme
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    colorThemeState: ColorThemePref,
+    onColorThemeSelected: (ColorThemePref) -> Unit
+) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colors.background)
@@ -36,27 +39,46 @@ fun SettingsScreen() {
 
         Card {
             Column {
-                SettingsItem(title = stringResource(id = R.string.theme_light), selected = true)
+                SettingsItem(
+                    colorThemePref = ColorThemePref.LIGHT,
+                    currentTheme = colorThemeState,
+                    onColorThemeSelected = onColorThemeSelected
+                )
                 Divider()
-                SettingsItem(title = stringResource(id = R.string.theme_dark), selected = false)
+                SettingsItem(
+                    colorThemePref = ColorThemePref.DARK,
+                    currentTheme = colorThemeState,
+                    onColorThemeSelected = onColorThemeSelected
+                )
             }
         }
     }
 }
 
 @Composable
-fun SettingsItem(title: String, selected: Boolean) {
+fun SettingsItem(
+    colorThemePref: ColorThemePref,
+    currentTheme: ColorThemePref,
+    onColorThemeSelected: (ColorThemePref) -> Unit
+) {
     Row(
         modifier = Modifier
-            .clickable { Log.d("SETTINGS", "Click $title") }
+            .clickable { onColorThemeSelected(colorThemePref) }
             .padding(16.dp)
     ) {
+        val title = stringResource(
+            id = when (colorThemePref) {
+                ColorThemePref.LIGHT -> R.string.theme_light
+                ColorThemePref.DARK -> R.string.theme_dark
+            }
+        )
+
         Text(
             text = title,
             modifier = Modifier.weight(1f)
         )
 
-        if (selected) {
+        if (currentTheme == colorThemePref) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = title,
@@ -68,8 +90,18 @@ fun SettingsItem(title: String, selected: Boolean) {
 
 @Preview
 @Composable
-fun SettingsPreview() {
+fun SettingsPreviewLight() {
     OtteRssTheme {
-        SettingsScreen()
+        SettingsScreen(ColorThemePref.LIGHT) {}
+    }
+}
+
+@Preview
+@Composable
+fun SettingsPreviewDark() {
+    OtteRssTheme(
+        currentTheme = ColorThemePref.DARK
+    ) {
+        SettingsScreen(ColorThemePref.DARK) {}
     }
 }
